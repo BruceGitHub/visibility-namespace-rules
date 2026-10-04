@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/BruceGitHub/visibility-namespace-rules/actions/workflows/ci.yml/badge.svg)](https://github.com/BruceGitHub/visibility-namespace-rules/actions/workflows/ci.yml)
 
-PHPStan rules for **namespace-scoped visibility**: mark a namespace as *private*
+PHPStan rules for **namespace-scoped visibility**: mark a namespace as _private_
 and decide exactly which classes, interfaces, traits or sub-namespaces stay
 open — plus which external namespaces are allowed in.
 
@@ -66,11 +66,11 @@ The entrypoint builds a temporary PHPStan config that includes these rules plus
 your `namespace-visibility.neon`, and runs `phpstan analyse`. Extra arguments
 are forwarded to PHPStan (e.g. `src tests` or `--error-format=json`).
 
-| Environment variable | Default | Description |
-| --- | --- | --- |
-| `PHPSTAN_CONFIG` | `/app/namespace-visibility.neon` if present | Config defining `namespaceVisibility`. |
-| `PHPSTAN_LEVEL` | `max` | PHPStan rule level. |
-| `PHPSTAN_MEMORY_LIMIT` | PHPStan default | e.g. `1G`. |
+| Environment variable   | Default                                     | Description                            |
+| ---------------------- | ------------------------------------------- | -------------------------------------- |
+| `PHPSTAN_CONFIG`       | `/app/namespace-visibility.neon` if present | Config defining `namespaceVisibility`. |
+| `PHPSTAN_LEVEL`        | `max`                                       | PHPStan rule level.                    |
+| `PHPSTAN_MEMORY_LIMIT` | PHPStan default                             | e.g. `1G`.                             |
 
 The rule picks up your project's autoloader automatically
 (`/app/vendor/autoload.php`) when present, so symbols resolve. Want to mount only
@@ -135,13 +135,13 @@ parameters:
 
 ### Reference
 
-| Key | Type | Description |
-| --- | --- | --- |
-| `default` | `public` \| `private` | Visibility for namespaces that are not listed. Defaults to `public`. |
-| `namespaces` | map | Per-namespace configuration keyed by namespace prefix. |
-| `namespaces.<ns>.visibility` | `public` \| `private` | Overrides the entry visibility. Defaults to the opposite of `default` (so listing a namespace in `public` mode makes it private, and vice versa). |
-| `namespaces.<ns>.exposed` | list | Classes/interfaces/traits/enums or sub-namespace prefixes that are reachable from **everywhere**, even though the namespace is private. |
-| `namespaces.<ns>.allowed_namespaces` | list | External namespace prefixes allowed to reference the private namespace (C# `InternalsVisibleTo`). |
+| Key                                  | Type                  | Description                                                                                                                                       |
+| ------------------------------------ | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `default`                            | `public` \| `private` | Visibility for namespaces that are not listed. Defaults to `public`.                                                                              |
+| `namespaces`                         | map                   | Per-namespace configuration keyed by namespace prefix.                                                                                            |
+| `namespaces.<ns>.visibility`         | `public` \| `private` | Overrides the entry visibility. Defaults to the opposite of `default` (so listing a namespace in `public` mode makes it private, and vice versa). |
+| `namespaces.<ns>.exposed`            | list                  | Classes/interfaces/traits/enums or sub-namespace prefixes that are reachable from **everywhere**, even though the namespace is private.           |
+| `namespaces.<ns>.allowed_namespaces` | list                  | External namespace prefixes allowed to reference the private namespace (C# `InternalsVisibleTo`).                                                 |
 
 Rules applied to a referenced symbol:
 
@@ -187,6 +187,18 @@ docker compose exec app vendor/bin/pest            # tests
 docker compose exec app vendor/bin/phpstan analyse  # static analysis
 docker compose exec app vendor/bin/php-cs-fixer fix --allow-risky=yes
 ```
+
+### Quality gate
+
+The authoritative quality gate lives in `quality-kit/` (read-only, treat it like
+`vendor/`). It bundles PHPStan, PHP-CS-Fixer, Mago, PHPMD, Pest, ESLint, Prettier,
+Semgrep, jscpd and a phpmetrics threshold check:
+
+```bash
+make -C quality-kit quality PROJECT=.. CONFIG=../quality-kit-generated DIRS="src tests" TEST="vendor/bin/pest"
+```
+
+It must be fully green before merging.
 
 ## License
 

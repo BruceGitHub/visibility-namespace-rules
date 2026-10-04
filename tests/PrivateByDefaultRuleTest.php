@@ -30,41 +30,21 @@ final class PrivateByDefaultRuleTest extends RuleTestCase
         ]);
     }
 
-    public function testExplicitlyPublicNamespaceIsReachable(): void
+    public function testReachableReferencesProduceNoErrors(): void
     {
-        $this->analyse([__DIR__ . '/data/private/public_namespace.php'], []);
+        $this->analyse([dirname(__DIR__) . '/fixtures/private/public_namespace.php'], []);
+        $this->analyse([dirname(__DIR__) . '/fixtures/private/unlisted_same_tree.php'], []);
+        $this->analyse([dirname(__DIR__) . '/fixtures/private/internal_friend.php'], []);
     }
 
-    public function testUnconfiguredNamespaceIsBlockedAcrossTrees(): void
+    public function testBlockedReferencesAreReported(): void
     {
-        $this->analyse([__DIR__ . '/data/private/unlisted_cross.php'], [
-            [$this->message('App\Other', 'App\Filesystem'), 9],
+        $this->analyse([dirname(__DIR__) . '/fixtures/private/unlisted_cross.php'], [
+            [rule_error(privateNamespace: 'App\Other', currentNamespace: 'App\Filesystem'), 9],
         ]);
-    }
 
-    public function testUnconfiguredNamespaceIsReachableWithinItsTree(): void
-    {
-        $this->analyse([__DIR__ . '/data/private/unlisted_same_tree.php'], []);
-    }
-
-    public function testExplicitlyPrivateNamespaceIsBlocked(): void
-    {
-        $this->analyse([__DIR__ . '/data/private/internal_blocked.php'], [
-            [$this->message('App\Internal', 'App\Filesystem'), 9],
+        $this->analyse([dirname(__DIR__) . '/fixtures/private/internal_blocked.php'], [
+            [rule_error(privateNamespace: 'App\Internal', currentNamespace: 'App\Filesystem'), 9],
         ]);
-    }
-
-    public function testFriendNamespaceIsReachable(): void
-    {
-        $this->analyse([__DIR__ . '/data/private/internal_friend.php'], []);
-    }
-
-    private function message(string $privateNamespace, string $currentNamespace): string
-    {
-        return sprintf(
-            "Access to private namespace '%s' is not allowed from namespace '%s'.",
-            $privateNamespace,
-            $currentNamespace,
-        );
     }
 }

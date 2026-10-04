@@ -33,61 +33,40 @@ final class PrivateNamespaceRuleTest extends RuleTestCase
         ]);
     }
 
-    public function testAccessFromOutsideIsBlocked(): void
+    public function testAllowedReferencesProduceNoErrors(): void
     {
-        $this->analyse([__DIR__ . '/data/public/blocked.php'], [
-            [$this->message('App\Internal', 'App\Api'), 9],
-            [$this->message('App\Internal', 'App\Api'), 10],
-            [$this->message('App\Internal', 'App\Api'), 11],
+        $this->analyse([dirname(__DIR__) . '/fixtures/public/internal.php'], []);
+        $this->analyse([dirname(__DIR__) . '/fixtures/public/exposed.php'], []);
+        $this->analyse([dirname(__DIR__) . '/fixtures/public/friend.php'], []);
+    }
+
+    public function testBlockedReferencesAreReported(): void
+    {
+        $message = rule_error(privateNamespace: 'App\Internal', currentNamespace: 'App\Api');
+
+        $this->analyse([dirname(__DIR__) . '/fixtures/public/blocked.php'], [
+            [$message, 9],
+            [$message, 10],
+            [$message, 11],
         ]);
-    }
 
-    public function testAccessFromInsideThePrivateTreeIsAllowed(): void
-    {
-        $this->analyse([__DIR__ . '/data/public/internal.php'], []);
-    }
-
-    public function testExposedSymbolsAreAllowed(): void
-    {
-        $this->analyse([__DIR__ . '/data/public/exposed.php'], []);
-    }
-
-    public function testFriendNamespacesAreAllowed(): void
-    {
-        $this->analyse([__DIR__ . '/data/public/friend.php'], []);
-    }
-
-    public function testAccessFromTheGlobalNamespaceIsBlocked(): void
-    {
-        $this->analyse([__DIR__ . '/data/public/global.php'], [
-            [$this->message('App\Internal', '{global}'), 5],
+        $this->analyse([dirname(__DIR__) . '/fixtures/public/global.php'], [
+            [rule_error(privateNamespace: 'App\Internal', currentNamespace: '{global}'), 5],
         ]);
-    }
 
-    public function testEveryReferenceKindIsReported(): void
-    {
-        $this->analyse([__DIR__ . '/data/public/references.php'], [
-            [$this->message('App\Internal', 'App\Api'), 14],
-            [$this->message('App\Internal', 'App\Api'), 14],
-            [$this->message('App\Internal', 'App\Api'), 16],
-            [$this->message('App\Internal', 'App\Api'), 18],
-            [$this->message('App\Internal', 'App\Api'), 22],
-            [$this->message('App\Internal', 'App\Api'), 22],
-            [$this->message('App\Internal', 'App\Api'), 22],
-            [$this->message('App\Internal', 'App\Api'), 24],
-            [$this->message('App\Internal', 'App\Api'), 25],
-            [$this->message('App\Internal', 'App\Api'), 29],
-            [$this->message('App\Internal', 'App\Api'), 30],
-            [$this->message('App\Internal', 'App\Api'), 13],
+        $this->analyse([dirname(__DIR__) . '/fixtures/public/references.php'], [
+            [$message, 14],
+            [$message, 14],
+            [$message, 16],
+            [$message, 18],
+            [$message, 22],
+            [$message, 22],
+            [$message, 22],
+            [$message, 24],
+            [$message, 25],
+            [$message, 29],
+            [$message, 30],
+            [$message, 13],
         ]);
-    }
-
-    private function message(string $privateNamespace, string $currentNamespace): string
-    {
-        return sprintf(
-            "Access to private namespace '%s' is not allowed from namespace '%s'.",
-            $privateNamespace,
-            $currentNamespace,
-        );
     }
 }
