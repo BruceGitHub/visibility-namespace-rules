@@ -1,0 +1,22 @@
+parametersSchema:
+    namespaceVisibility: structure({
+        ?default: string(),
+        ?namespaces: arrayOf(structure({
+            ?visibility: string(),
+            ?exposed: listOf(string()),
+            ?allowed_namespaces: listOf(string())
+        }))
+    })
+
+parameters:
+    namespaceVisibility:
+        default: public
+        namespaces: []
+
+services:
+    -
+        class: BruceGitHub\VisibilityNamespaceRules\PrivateNamespaceRule
+        arguments:
+            namespaceVisibility: %namespaceVisibility%
+        tags:
+            - phpstan.rules.rule

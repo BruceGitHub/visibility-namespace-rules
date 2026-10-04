@@ -1,0 +1,12 @@
+.git
+.github
+vendor
+tests
+.php-cs-fixer.cache
+.phpunit.cache
+.phpunit.result.cache
+docker-compose.yml
+Dockerfile
+AGENTS.md
+README.md
+LICENSE
