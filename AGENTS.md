@@ -19,7 +19,7 @@
 - `src/PrivateNamespaceRule.php` — AST rule: extracts class-like references and delegates to the resolver. Only "leaf" reference nodes are handled; nullable/union/intersection types are traversed recursively, so each reference is reported exactly once.
 - `extension.neon` — `parametersSchema` + default `%namespaceVisibility%` + service registration. `phpstan.neon` merely includes it.
 - `docker/Dockerfile` — standalone distribution image (bundled PHPStan), built **only** from `composer.json`, `composer.lock`, `src/` and `extension.neon`. `docker/entrypoint.sh` composes a temp config from `extension.neon` + the consumer config and forwards args. Keep the `COPY` list in sync when adding files.
-- `.github/workflows/ci.yml` — tests/phpstan/php-cs-fixer on PHP 8.1–8.3. There is no registry publishing: consumers build `docker/Dockerfile` locally.
+- `.github/workflows/ci.yml` — tests/phpstan/php-cs-fixer on PHP 8.2–8.4. There is no registry publishing: consumers build `docker/Dockerfile` locally.
 - `tests/NamespaceVisibilityResolverTest.php` — Pest unit tests for the resolver.
 - `tests/PrivateNamespaceRuleTest.php` / `PrivateByDefaultRuleTest.php` — `PHPStan\Testing\RuleTestCase` integration tests.
 - `tests/data/**` — fixtures. Files here must NOT match `*Test.php` or PHPUnit will try to run them.
