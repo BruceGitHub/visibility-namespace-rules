@@ -25,15 +25,15 @@ file/namespace-root based signal. This package gives you:
 - **friend namespaces** — let specific external namespaces through, like C# `InternalsVisibleTo`;
 - **namespace-tree awareness** — access stays allowed inside the private namespace tree.
 
-## Installation
+## Getting started
 
-The recommended way is the standalone Docker image: it bundles PHPStan and these
-rules, so your project keeps its own PHPStan version and cannot hit dependency
-conflicts.
+The recommended way to use these rules is the standalone Docker image: it bundles
+PHPStan and the rules, so your project keeps its own PHPStan version and cannot
+hit dependency conflicts. Applying it to a target project takes three steps.
 
-### Docker (recommended)
+### 1. Build the image
 
-Build the image once from this repository:
+Once, from this repository:
 
 ```bash
 git clone https://github.com/BruceGitHub/visibility-namespace-rules.git
@@ -41,7 +41,9 @@ cd visibility-namespace-rules
 docker build -f docker/Dockerfile -t visibility-namespace-rules .
 ```
 
-Add a `namespace-visibility.neon` to your project root:
+### 2. Describe your visibility
+
+In your target project root, add a `namespace-visibility.neon`:
 
 ```neon
 parameters:
@@ -55,16 +57,28 @@ parameters:
                     - 'App\Tests'
 ```
 
-Then run it from your project root:
+See [Configuration](#configuration) for every option.
+
+### 3. Analyse your code
+
+From your project root:
 
 ```bash
-docker run --rm -v "$PWD":/app -w /app \
-    visibility-namespace-rules src
+docker run --rm -v "$PWD":/app -w /app visibility-namespace-rules src
 ```
 
-The entrypoint builds a temporary PHPStan config that includes these rules plus
-your `namespace-visibility.neon`, and runs `phpstan analyse`. Extra arguments
-are forwarded to PHPStan (e.g. `src tests` or `--error-format=json`).
+The entrypoint builds a temporary PHPStan config from these rules plus your
+`namespace-visibility.neon`, and runs `phpstan analyse`. Extra arguments are
+forwarded to PHPStan (e.g. `src tests` or `--error-format=json`). The command
+exits non-zero when code outside a private namespace references it, so you can
+wire it straight into CI.
+
+## Installation
+
+### Docker
+
+The [getting started](#getting-started) flow covers the common case. These
+options tune the bundled PHPStan:
 
 | Environment variable   | Default                                     | Description                            |
 | ---------------------- | ------------------------------------------- | -------------------------------------- |
@@ -187,18 +201,6 @@ docker compose exec app vendor/bin/pest            # tests
 docker compose exec app vendor/bin/phpstan analyse  # static analysis
 docker compose exec app vendor/bin/php-cs-fixer fix --allow-risky=yes
 ```
-
-### Quality gate
-
-The authoritative quality gate lives in `quality-kit/` (read-only, treat it like
-`vendor/`). It bundles PHPStan, PHP-CS-Fixer, Mago, PHPMD, Pest, ESLint, Prettier,
-Semgrep, jscpd and a phpmetrics threshold check:
-
-```bash
-make -C quality-kit quality PROJECT=.. CONFIG=../quality-kit-generated DIRS="src tests" TEST="vendor/bin/pest"
-```
-
-It must be fully green before merging.
 
 ## License
 
