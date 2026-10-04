@@ -1,6 +1,10 @@
 # Dependencies
 /vendor/
-quality-kit/local/quality/vendor/
+
+# Quality kit (copied, read-only tooling — like vendor/)
+/quality-kit/
+/quality-kit-generated/
+/.prettierignore
 
 # Caches
 /.php-cs-fixer.cache
@@ -8,12 +12,6 @@ quality-kit/local/quality/vendor/
 /.phpunit.result.cache
 /.pest/
 .mago/
-
-# Quality kit generated output (reports); keep the generated configs committed.
-quality-kit-generated/reports/
-
-# Kitchen-sink lockfile installed automatically by the kit
-quality-kit/local/quality/composer.lock
 
 # Editor
 /.vimsession
