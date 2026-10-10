@@ -15,6 +15,14 @@ is inspired by the namespace visibility proposals:
 PHP does not support namespace visibility natively, so this package enforces the
 boundaries with static analysis instead.
 
+> [!WARNING]
+> **Work in progress — not production ready.** This project is still under
+> active development and the configuration surface, error messages and rules may
+> change without notice. Do not rely on it as a stability guarantee yet.
+> Feedback, ideas and proposals are very welcome: please open an
+> [issue](https://github.com/BruceGitHub/visibility-namespace-rules/issues) or a
+> [discussion](https://github.com/BruceGitHub/visibility-namespace-rules/discussions).
+
 ## How it compares to `@internal`
 
 PHPStan already understands the `@internal` annotation, but it is a coarse,
@@ -106,6 +114,24 @@ it is registered automatically; otherwise include it manually:
 includes:
     - vendor/brucegithub/visibility-namespace-rules/extension.neon
 ```
+
+### Agent skill (alternative to the deterministic rule)
+
+If you use an agentic coding tool (OpenCode, Claude Code, …) and would rather
+not install PHPStan, the repository ships a skill that implements the **same
+semantics** as the PHPStan rule. The skill reads your
+`namespace-visibility.neon` and applies the visibility rules by inspecting the
+code, reporting the very same `privateNamespace.access` violations.
+
+The deterministic rule stays the recommended option for CI: it is fast,
+reproducible and cannot hallucinate. Reach for the skill when you want an
+in-conversation check without a PHP toolchain.
+
+The skill lives at `.opencode/skills/namespace-visibility/SKILL.md` and is
+discovered automatically while working in this repository. To reuse it
+elsewhere, copy the `namespace-visibility/` directory into your project's
+`.opencode/skills/` (or `~/.config/opencode/skills/`) and mention
+`@namespace-visibility` to load it.
 
 ## Configuration
 

@@ -42,6 +42,7 @@ Gate-specific traps that took work to satisfy:
 - `extension.neon` — `parametersSchema` + default `%namespaceVisibility%` + service registration. `phpstan.neon` merely includes it.
 - `docker/Dockerfile` — standalone distribution image (bundled PHPStan), built **only** from `composer.json`, `composer.lock`, `src/` and `extension.neon`. `docker/entrypoint.sh` composes a temp config from `extension.neon` + the consumer config and forwards args. Keep the `COPY` list in sync when adding files.
 - `.github/workflows/ci.yml` — tests/phpstan/php-cs-fixer on PHP 8.2–8.4. There is no registry publishing: consumers build `docker/Dockerfile` locally.
+- `.opencode/skills/namespace-visibility/SKILL.md` — agent skill that mirrors the rule for tools without PHPStan: it reads the consumer's `namespace-visibility.neon` and applies the same `privateNamespace.access` semantics. Keep it in sync with `NamespaceVisibilityResolver`; it is not part of the Docker distribution.
 - `tests/NamespaceVisibilityResolverTest.php` — Pest unit tests for the resolver.
 - `tests/PrivateNamespaceRuleTest.php` / `PrivateByDefaultRuleTest.php` — `PHPStan\Testing\RuleTestCase` integration tests. They reference fixtures via `dirname(__DIR__) . '/fixtures/...'`.
 - `fixtures/**` — rule fixtures, intentionally outside `src`/`tests` so the quality-kit PHPStan gate does not flag the deliberately-undefined classes. Files here must NOT match `*Test.php` or PHPUnit will try to run them.
