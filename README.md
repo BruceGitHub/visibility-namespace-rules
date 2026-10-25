@@ -228,6 +228,27 @@ docker compose exec app vendor/bin/phpstan analyse  # static analysis
 docker compose exec app vendor/bin/php-cs-fixer fix --allow-risky=yes
 ```
 
+## Releases
+
+Versioning and changelogs are managed with [Changesets](https://changesets.dev).
+The repository is not published to npm: `package.json` only tracks the version,
+and Composer derives the package version from the git tag.
+
+Every pull request that changes behaviour should ship a changeset:
+
+```bash
+npm install     # once, installs @changesets/cli
+npm run changeset
+```
+
+On every push to `master`, the `Release` workflow opens (or updates) a
+**chore: release** pull request containing the version bump and the `CHANGELOG.md`
+entry. Merging it tags the commit (`vX.Y.Z`) and creates the GitHub release.
+
+One-time repository setup: enable _Settings → Actions → General → Allow GitHub
+Actions to create and approve pull requests_, otherwise the workflow cannot open
+the version pull request.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

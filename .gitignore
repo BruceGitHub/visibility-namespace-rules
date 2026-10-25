@@ -1,5 +1,6 @@
 # Dependencies
 /vendor/
+/node_modules/
 
 # Quality kit (copied, read-only tooling — like vendor/)
 /quality-kit/

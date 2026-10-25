@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    branches: [master]
+
+# Reset the default token permissions: each job only gets what it needs.
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # commit the version bump and push the vX.Y.Z tag
+      pull-requests: write # open/update the version pull request
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install tooling
+        run: npm ci
+
+      # Opens/updates the "chore: release" pull request while there are pending
+      # changesets; after it is merged it tags vX.Y.Z and creates the release.
+      - name: Version or tag
+        uses: changesets/action@v2
+        with:
+          version-script: npm run version-packages
+          publish-script: npm run release
+          commit-message: 'chore: release'
+          pr-title: 'chore: release'

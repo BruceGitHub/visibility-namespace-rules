@@ -1,0 +1,12 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@4.0.1/schema.json",
+  "baseBranch": "master",
+  "access": "restricted",
+  "format": "prettier",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "privatePackages": {
+    "version": true,
+    "tag": true
+  }
+}

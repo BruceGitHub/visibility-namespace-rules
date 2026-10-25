@@ -1,0 +1,23 @@
+{
+  "name": "visibility-namespace-rules",
+  "version": "0.0.0",
+  "private": true,
+  "description": "PHPStan rules for namespace-scoped visibility (private namespaces, C#-style internal).",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BruceGitHub/visibility-namespace-rules.git"
+  },
+  "scripts": {
+    "changeset": "changeset",
+    "release": "changeset publish",
+    "version-packages": "changeset version"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^3.0.3",
+    "prettier": "^3.9.10"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -42,10 +42,20 @@ Gate-specific traps that took work to satisfy:
 - `extension.neon` — `parametersSchema` + default `%namespaceVisibility%` + service registration. `phpstan.neon` merely includes it.
 - `docker/Dockerfile` — standalone distribution image (bundled PHPStan), built **only** from `composer.json`, `composer.lock`, `src/` and `extension.neon`. `docker/entrypoint.sh` composes a temp config from `extension.neon` + the consumer config and forwards args. Keep the `COPY` list in sync when adding files.
 - `.github/workflows/ci.yml` — tests/phpstan/php-cs-fixer on PHP 8.2–8.4. There is no registry publishing: consumers build `docker/Dockerfile` locally.
+- `package.json` / `package-lock.json` — private npm manifest that exists only to run `@changesets/cli` (version source of truth + npm scripts). Not shipped: Composer takes the version from the `vX.Y.Z` git tag.
+- `.changeset/` — pending changesets (`config.json` + one markdown file per PR). `privatePackages: { version: true, tag: true }` makes Changesets version and tag this private package; tags are `vX.Y.Z` because the repo is a single "root" package.
+- `.github/workflows/release.yml` — on push to `master` it opens the "chore: release" PR, then tags the merge commit and creates the GitHub release.
 - `.opencode/skills/namespace-visibility/SKILL.md` — agent skill that mirrors the rule for tools without PHPStan: it reads the consumer's `namespace-visibility.neon` and applies the same `privateNamespace.access` semantics. Keep it in sync with `NamespaceVisibilityResolver`; it is not part of the Docker distribution.
 - `tests/NamespaceVisibilityResolverTest.php` — Pest unit tests for the resolver.
 - `tests/PrivateNamespaceRuleTest.php` / `PrivateByDefaultRuleTest.php` — `PHPStan\Testing\RuleTestCase` integration tests. They reference fixtures via `dirname(__DIR__) . '/fixtures/...'`.
 - `fixtures/**` — rule fixtures, intentionally outside `src`/`tests` so the quality-kit PHPStan gate does not flag the deliberately-undefined classes. Files here must NOT match `*Test.php` or PHPUnit will try to run them.
+
+## Releases (changesets)
+
+- The tooling runs on Node (host or CI), not in the PHP container: `npm install`, then `npm run changeset` to write a `.changeset/<slug>.md` with a `patch`/`minor`/`major` bump. `npm run version-packages` (`changeset version`) and `npm run release` (`changeset publish`) are the commands the workflow calls.
+- Any behaviour change should ship a changeset; docs-only or tooling-only changes can skip it (use `npm run changeset -- --empty` when a release must stay empty).
+- Never edit the version in `package.json` by hand: `changeset version` bumps it and writes `CHANGELOG.md`. `composer.json` deliberately has no `version` — Composer/Packagist derive it from the `vX.Y.Z` tag.
+- `.changeset/*.md` and `package.json` are covered by the Prettier `format-check` gate, so keep them formatted.
 
 ## Configuration contract
 
@@ -58,4 +68,5 @@ Gate-specific traps that took work to satisfy:
 
 - PHPStan **2.x is required**: `php-cs-fixer` pulls `nikic/php-parser` v5, which fatals PHPStan 1.x (`PhpParserDecorator` abstract `Parser::getTokens`). The `^1.11 || ^2.0` constraint exists for API compatibility, but a fresh install resolves 2.x.
 - `rector` was removed: it was broken (phpdoc-parser mismatch) and is not part of the toolchain.
+- The root `.prettierrc.json` mirrors `quality-kit-generated/.prettierrc.json`: Changesets uses it to format generated changesets/changelogs (the `.prettierignore` is kit-generated and gitignored). Keep the two configs in sync.
 - Custom PHPStan parameters must be declared in `parametersSchema`, using Nette syntax `?key: type()` inside `structure({...})`; otherwise PHPStan aborts with "Unexpected item 'parameters › namespaceVisibility'".
